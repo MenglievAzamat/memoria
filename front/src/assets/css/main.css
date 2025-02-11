@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --golden-gradient: linear-gradient(0deg, #E3B661, #FDD892, #FFE8BD);
+    --golden-gradient-inverted: linear-gradient(0deg, #b7a687, #ab9262, #8a6f3c);
+    --dark-grey: #151515;
+}
+
+* {
+    font-family: Montserrat, sans-serif;
+    scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+    display: none;
+}
+
+h1 {
+    font-size: 1.625rem;
+    color: white;
+    line-height: 28px;
+}
+
+p {
+    font-family: Helvetica, sans-serif;
+    color: white;
+    font-size: 1rem;
+    line-height: 17px;
+}
+
+@font-face {
+    font-family: 'Leotaro';
+    font-style: normal;
+    font-weight: 400;
+    src: url(../fonts/Leotaro-Regular.otf) format('opentype');
+}
+
+.text-gold {
+    font-size: 2rem;
+    background: var(--golden-gradient);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+input:not(input[type=radio]), textarea {
+    @apply w-full py-[1rem] px-[1.3125rem] rounded-[8px] bg-[#D9D9D9];
+}
+
+button {
+    @apply w-[9.5625rem] h-[2.9375rem] rounded flex justify-center items-center !text-black;
+    background: var(--golden-gradient);
+    font-size: 0.875rem;
+
+}
+
+button:active:not(:disabled) {
+    background: var(--golden-gradient-inverted);
+    color: white;
+}
+
+button:disabled {
+    background: grey;
+}
+
+.memoria-bg {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("@/assets/img/background.webp");
+    background-size: cover;
+    background-position: 0;
+}
+
+.texture-bg {
+    background: url("@/assets/img/texture.webp");
+    background-size: cover;
+    background-position: 0;
+}
+
+table {
+    color: white;
+    text-align: center;
+    @apply w-full;
+}
+
+th:not(:last-of-type), td:not(:last-of-type) {
+    border-right: 1px solid rgba(253, 216, 146, .3);
+}
+
+thead tr {
+    border-bottom: 1px solid rgba(253, 216, 146, .3);
+}
+
+tbody tr:not(:last-of-type) {
+    border-bottom: 1px solid rgba(253, 216, 146, .3);
+}
+
+tbody tr:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
+.search-icon:hover {
+    cursor: pointer;
+}
+
+.search-icon:hover > svg path{
+    fill: white;
+}
+
+.search-icon:active{
+    transform: scale(0.92);
+}
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
