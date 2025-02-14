@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
 /**
+ * @property int $id
  * @property int $book_id
  * @property string $title
  * @property string $question
+ * @property string $text
+ * @property int $last_page
  * @property Book $book
  * @property Collection $pages
  */
@@ -18,7 +21,8 @@ class Chapter extends Model
 {
     protected $fillable = [
         'title',
-        'question'
+        'question',
+        'text'
     ];
 
     public function book(): BelongsTo
@@ -29,5 +33,38 @@ class Chapter extends Model
     public function pages(): HasMany
     {
         return $this->hasMany(Page::class);
+    }
+
+    public function countPages(): int
+    {
+        $result = [];
+
+        if ($this->text) {
+            $words = preg_split('/\s/', $this->text);
+            $page = '';
+
+            foreach ($words as $word) {
+                if (mb_strlen($word) + mb_strlen($page) <= 500) {
+                    $page .= $word . ' ';
+                } else {
+                    $result[] = trim($page);
+                    $page = '';
+                }
+            }
+
+            if (mb_strlen($page) !== 0) {
+                $result[] = trim($page);
+            }
+        }
+
+        return count($result);
+    }
+
+    public function previousChapterId(): ?int
+    {
+        $chapters = Chapter::query()->where('book_id', $this->book_id)->pluck('id');
+        $currentIndex = $chapters->filter(fn ($chapterId) => $chapterId === $this->id)->keys();
+
+        return $chapters[$currentIndex->first() - 1] ?? null;
     }
 }

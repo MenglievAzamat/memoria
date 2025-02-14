@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('book_status_id')->default(1);
             $table->string('title', 50)->nullable();
             $table->string('subtitle', 100)->nullable();
+            $table->boolean('open')->default(false);
             $table->timestamps();
         });
     }

@@ -58,17 +58,12 @@ class AdminController extends Controller
         $book = Book::query()->findOrFail($bookId);
 
         $lastChapter = $book->chapters()->latest()->first();
-        $pageNumber = $lastChapter?->pages()->latest()->first()?->page_number + 1 ?? 1;
 
         $chapter = new Chapter();
         $chapter->book_id = $bookId;
         $chapter->title = $request->input('title');
         $chapter->question = $request->input('question');
         $chapter->save();
-
-        $chapter->pages()->create([
-            'page_number' => $pageNumber
-        ]);
 
         return response()->json([
             'message' => 'Глава создана!'

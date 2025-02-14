@@ -5,73 +5,33 @@
             <h2 class="text-[0.99975rem] font-['Leotaro']">{{ payload.subtitle }}</h2>
         </div>
 
-        <div v-else-if="payload.page && payload.page % 2 !== 0" class="helvetica w-full h-full px-[1.5rem] z-10 flex">
-            <div class="w-1/2 h-full flex flex-col justify-center p-[4rem]">
-                <div class="header h-[10%]">
-                    <p class="text-black text-wrap text-[1.66625rem] font-['Leotaro'] text-left">{{ book.title }}</p>
-                </div>
-                <div class="h-[6%]">
-                    <p v-if="payload?.title" class="font-[Montserrat] text-black text-[1.66625rem] text-center mb-4 font-bold">{{ payload?.title }}</p>
-                </div>
-                <div class="body h-[79%]">
-                    <img v-if="payload[0]?.image" class="w-full h-full" :src="payload?.image" alt="">
-                    <p class="helvetica text-[1.4163125rem] text-black text-justify" v-html="text(payload?.text)"></p>
-                </div>
-                <div class="footer h-[5%]">
-                    <p class="helvetica text-[1.4163125rem] text-black">{{ payload ? payload.page : ''}}</p>
-                </div>
-            </div>
-            <div class="w-1/2 h-full"></div>
-        </div>
-
-        <div v-else-if="payload.page && (payload.page % 2 === 0 || false)" class="helvetica w-full h-full px-[1.5rem] z-10 flex">
-            <div class="w-1/2 h-full"></div>
-            <div class="w-1/2 h-full flex flex-col justify-center p-[4rem]">
-                <div class="header h-[10%]">
-                    <p class="text-black text-wrap text-[1.66625rem] font-['Leotaro'] text-right">{{ book.subtitle }}</p>
-                </div>
-                <div class="h-[6%]">
-                    <p v-if="payload?.title" class="font-[Montserrat] text-black text-[1.66625rem] text-center mb-4 font-bold">{{ payload?.title }}</p>
-                </div>
-                <div class="body h-[79%]">
-                    <img v-if="payload?.image" class="w-full h-full" :src="payload?.image" alt="">
-                    <p class="helvetica text-[1.4163125rem] text-black text-justify" v-html="text(payload?.text)"></p>
-                </div>
-                <div class="footer h-[5%]">
-                    <p class="helvetica text-[1.4163125rem]  text-black">{{ payload ? payload.page : ''}}</p>
-                </div>
-            </div>
-        </div>
-
         <div v-else class="helvetica w-full h-full px-[1.5rem] z-10 flex">
             <div class="w-1/2 h-full flex flex-col justify-center p-[4rem]">
                 <div class="header h-[10%]">
                     <p class="text-black text-wrap text-[1.66625rem] font-['Leotaro'] text-left">{{ book.title }}</p>
                 </div>
-                <div class="h-[6%]">
+                <div class="body h-[85%]">
                     <p v-if="payload[0]?.title" class="font-[Montserrat] text-black text-[1.66625rem] text-center mb-4 font-bold">{{ payload[0]?.title }}</p>
-                </div>
-                <div class="body h-[79%]">
                     <img v-if="payload[0]?.image" class="w-full h-full" :src="payload[0]?.image" alt="">
-                    <p class="helvetica text-[1.4163125rem] text-black text-justify" v-html="text(payload[0]?.text)"></p>
+                    <p class="break-words hyphens-auto helvetica text-[1.4163125rem] text-black text-justify" v-html="text(payload[0]?.text)"></p>
                 </div>
                 <div class="footer h-[5%]">
                     <p class="helvetica text-[1.4163125rem] text-black">{{ payload[0] ? payload[0].page : ''}}</p>
+                    <p class="helvetica text-[1.4163125rem] text-black">{{ payload[0].text.length}}</p>
                 </div>
             </div>
             <div class="w-1/2 h-full flex flex-col justify-center p-[4rem]">
                 <div class="header h-[10%]">
                     <p class="text-black text-wrap text-[1.66625rem] font-['Leotaro'] text-right">{{ book.subtitle }}</p>
                 </div>
-                <div class="h-[6%]">
+                <div class="body h-[85%]">
                     <p v-if="payload[1]?.title" class="font-[Montserrat] text-black text-[1.66625rem] text-center mb-4 font-bold">{{ payload[1]?.title }}</p>
-                </div>
-                <div class="body h-[79%]">
                     <img v-if="payload[1]?.image" class="w-full h-full" :src="payload[1]?.image" alt="">
-                    <p class="helvetica text-[1.4163125rem] text-black text-justify" v-html="text(payload[1]?.text)"></p>
+                    <p class="break-words hyphens-auto helvetica text-[1.4163125rem] text-black text-justify" v-html="text(payload[1]?.text)"></p>
                 </div>
                 <div class="footer h-[5%]">
                     <p class="helvetica text-[1.4163125rem]  text-black">{{ payload[1] ? payload[1].page : ''}}</p>
+                    <p class="helvetica text-[1.4163125rem]  text-black">{{ payload[1].text.length}}</p>
                 </div>
             </div>
         </div>

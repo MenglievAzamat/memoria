@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Chapter;
 
 use App\Http\Controllers\Controller;
+use App\Models\Book;
 use App\Models\Chapter;
 use App\Models\Page;
 use Illuminate\Http\JsonResponse;
@@ -12,36 +13,25 @@ class ChapterController extends Controller
 {
     public function getChapter(int $chapterId): JsonResponse
     {
+        $chapter = Chapter::query()->findOrFail($chapterId);
+
         return response()->json([
-            'chapter' => Chapter::query()->with('pages')->findOrFail($chapterId)
+            'chapter' => $chapter,
+            'pc_last_page' => $chapter->last_page ?? null
         ]);
     }
 
-    public function addPage(int $chapterId): JsonResponse
+    public function saveChapterText(Request $request, int $chapterId): JsonResponse
     {
-
         $chapter = Chapter::query()->findOrFail($chapterId);
-        $lastPage = $chapter->pages()->latest()->first();
-        $pageNumber = $lastPage->page_number + 1 ?? 1;
-        $book = $chapter->book;
+        $previousChapter = Chapter::query()->find($chapter->previousChapterId());
 
+        $chapter->text = $request->input('text');
+        $chapter->last_page = $previousChapter ? $previousChapter->last_page + $previousChapter->countPages() : null;
+        $chapter->save();
 
-        if ($book->pagesCount() < 100) {
-            $page = new Page();
-            $page->chapter_id = $chapterId;
-            $page->page_number = $pageNumber;
-            $page->save();
-
-            $page->chapter->book->rearrangePageNumbers();
-
-            return response()->json([
-                'message' => 'Страница добавлена',
-                'page' => $page
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'Достигнут лимит в 100 страниц! Невозможно создать новую',
-            ], 422);
-        }
+        return response()->json([
+            'message' => 'Сохранено'
+        ]);
     }
 }

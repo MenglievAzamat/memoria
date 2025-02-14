@@ -77,19 +77,11 @@ class BookController extends Controller
     {
         $book = Book::query()->findOrFail($bookId);
 
-        $chapters = $book->chapters()->with('pages')->get();
-        $chapterIds = $chapters->pluck('id');
+        $chapters = $book->chapters()->get();
 
-        $pagesQuery = Page::query()->whereIn('chapter_id', $chapterIds);
-        $pagesCount = $pagesQuery->count();
-        $progress = $pagesQuery
-            ->where('text', '!=', null)
-            ->orWhere('image', '!=', null)
-            ->count();
-
-        return response()->json(['chapters' => $chapters,
-            'total_count' => $pagesCount,
-            'progress' => $progress,]);
+        return response()->json([
+            'chapters' => $chapters
+        ]);
     }
 
     public function saveTitle(Request $request, int $bookId): JsonResponse

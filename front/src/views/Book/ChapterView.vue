@@ -4,43 +4,40 @@
         <p v-if="user.type !== 'admin'" class="leading-none text-[1.5rem] mb-10">{{ chapter?.question }}</p>
         <div v-else>
             <div class="flex">
-                <input class="text-[1.5rem] mb-4 h-[2.9375rem] !rounded-r-none" type="text" v-model="chapter.title" placeholder="Заголовок...">
+                <input class="text-[1.5rem] mb-4 h-[2.9375rem] !rounded-r-none" type="text" v-model="chapter.title"
+                       placeholder="Заголовок...">
             </div>
             <div class="flex">
-                <input class="text-[1.5rem] mb-10 h-[2.9375rem] !rounded-r-none" type="text" v-model="chapter.question" placeholder="Вопрос...">
+                <input class="text-[1.5rem] mb-10 h-[2.9375rem] !rounded-r-none" type="text" v-model="chapter.question"
+                       placeholder="Вопрос...">
                 <button class="!rounded-l-none" @click="saveQuestion">Сохранить</button>
             </div>
         </div>
 
-        <p class="mb-4">Сраница: {{ page.page_number }}</p>
+        <p class="mb-4"></p>
         <textarea
             class="mb-4"
             rows="8"
             placeholder="Введите текст..."
-            v-model="page.text"
-            :disabled="!!page.image"
+            v-model="chapter.text"
+            @input="updateCursorPosition"
+            @click="updateCursorPosition"
+            @keyup="updateCursorPosition"
         ></textarea>
         <div class="flex justify-between mb-8">
             <div class="flex items-start">
-                <button class="mr-2" @click="savePage">Сохранить</button>
-                <button class="mr-2" @click="startUpload">
+                <button class="mr-2" @click="saveChapter">Сохранить</button>
+                <button class="mr-2" @click="startUpload" :disabled="cursorPosition === null">
                     <Icon class="mr-1" type="folder" color="black"/>
                     Добавить фото
                 </button>
-                <button @click="addPage" v-if="(page.text || page.image) && currentPage + 1 === totalPages">
-                    + Новая страница
-                </button>
                 <input id="fileInput" type="file" hidden @input="makeInput">
-            </div>
-
-            <div>
-                <p>{{ length }} / 500</p>
             </div>
         </div>
 
         <Pagination
-            :page="currentPage + firstPage"
-            :total_pages="totalPages + firstPage - 1"
+            :page="currentPage + offset"
+            :total_pages="totalPages"
             @nextPage="nextPage"
             @prevPage="previousPage"
             class="mb-[2.75rem]"
@@ -58,6 +55,7 @@ import Loading from "@/components/Loading.vue";
 import Pagination from "@/components/Pagination.vue";
 import {useUserStore} from "@/stores/user";
 import {useAdminStore} from "@/stores/admin";
+import { chapterDivider, pageFormatter } from "@/plugins/helpers";
 
 export default {
     name: "ChapterView",
@@ -68,23 +66,17 @@ export default {
         userStore: useUserStore(),
         adminStore: useAdminStore(),
 
-        chapter: {},
-        pages: [],
-
-        prevPage: null,
-
-        page: {
-            id: 0,
-            text: null,
-            image: null,
+        chapter: {
+            title: null,
             question: null,
+            text: null,
         },
 
-        pageText: null,
-
-        currentPage: 0,
-        totalPages: 0,
-        firstPage: 1,
+        pages: [],
+        pagesFormatted: [],
+        currentPage: 1,
+        offset: 0,
+        cursorPosition: null,
 
         image: null,
 
@@ -92,51 +84,44 @@ export default {
     }),
 
     computed: {
+        totalPages() {
+            return (this.pages.length > 0 ? this.pages.length : 1) + this.offset
+        },
+
         user() {
             return this.userStore.user
         },
 
-        length() {
-            return this.page.text ? this.page.text.length : 0
-        },
-
         previewPayload() {
-            let payload = [];
+            let leftPage, rightPage
+            let pageNumber = this.currentPage + this.offset
+            let defaultPage = {
+                title: null,
+                text: null,
+                page: null,
+            }
 
-            if (this.prevPage) {
-                payload.push({
-                    text: this.prevPage.text,
-                    image: this.prevPage.image,
-                    page: this.prevPage.page_number,
-                    title: this.prevPage.page_number === this.firstPage ? this.chapter.title : null
-                })
-            } else  {
-                if (this.page.page_number % 2 === 0) {
-                    payload.push({
-                        text: null,
-                        image: null,
-                        page: null,
-                    })
+            if (pageNumber % 2 === 0){
+                if (this.pagesFormatted[this.currentPage - 2]) {
+                    leftPage = this.pagesFormatted[this.currentPage - 2]
+                } else {
+                    leftPage = defaultPage
                 }
+
+                rightPage = this.pagesFormatted[this.currentPage - 1]
+            } else {
+                if (this.pagesFormatted[this.currentPage]) {
+                    rightPage = this.pagesFormatted[this.currentPage]
+                } else {
+                    rightPage = defaultPage
+                }
+
+
+                leftPage = this.pagesFormatted[this.currentPage - 1]
             }
 
-            payload.push({
-                text: this.page.text,
-                image: this.page.image,
-                page: this.page.page_number,
-                title: this.page.page_number === this.firstPage ? this.chapter.title : null
-            })
-
-            if (this.pages[this.currentPage + 1]) {
-                payload.push({
-                    text: this.pages[this.currentPage + 1].text,
-                    image: this.pages[this.currentPage + 1].image,
-                    page: this.pages[this.currentPage + 1].page_number,
-                })
-            }
-
-            return payload
-        }
+            return [leftPage, rightPage]
+        },
     },
 
     methods: {
@@ -151,9 +136,9 @@ export default {
             if (files && files[0]) {
                 const reader = new FileReader()
 
-                reader.onload = (e) => {
-                    this.page.image = e.target.result
-                }
+                // reader.onload = (e) => {
+                //     this.image = e.target.result
+                // }
 
                 reader.readAsDataURL(files[0])
                 this.image = files[0]
@@ -161,60 +146,14 @@ export default {
             }
         },
 
-        async savePage() {
-            this.loading = true
-
-            let data = new FormData;
-            data.append('text', this.page.text)
-            data.append('image', this.image)
-
-            await this.bookStore.savePage(this.page.id, data)
-                .then(() => {
-                    this.page = this.bookStore.page
-                })
-                .finally(() => {
-                    location.reload()
-                })
-        },
-
-        async addPage() {
-            if (!this.canUpdate()) return;
-
-            this.loading = true
-
-            await this.bookStore.addPage(this.chapter.id)
-                .then(async () => {
-                    if (this.page.page_number % 2 !== 0) {
-                        this.setPrevPage()
-                    } else {
-                        this.prevPage = null
-                    }
-
-                    await this.getChapter().then(() => {
-                        this.page = this.bookStore.page
-                        this.currentPage = this.pages.length - 1
-                    })
-                })
-                .catch(err => {
-                    alert(err.response.data.message)
-                })
-                .finally(() => {
-                    this.loading = false
-                })
-        },
-
         async getChapter() {
             this.loading = true
-            this.prevPage = null
-            this.currentPage = 0
 
             await this.bookStore.getChapter(this.$route.params.id)
-                .then(() => {
-                    this.chapter = this.bookStore.chapter
-                    this.pages = this.chapter.pages
-                    this.page = this.pages[0]
-                    this.firstPage = this.page.page_number
-                    this.totalPages = this.pages.length
+                .then(response => {
+                    this.chapter = response.chapter
+                    this.offset = response.pc_last_page ?? 0
+                    this.currentPage = 1
                 })
                 .finally(() => {
                     this.loading = false
@@ -233,35 +172,24 @@ export default {
             await this.adminStore.saveChapterQuestion(chapterId, payload)
         },
 
-        setPrevPage() {
-            this.prevPage = this.page
+        async saveChapter() {
+            this.loading = true
+
+            await this.bookStore.saveChapter(this.chapter.id, this.chapter.text)
+                .finally(() => {
+                    this.loading = false
+                })
         },
 
         nextPage() {
-            if (!this.canUpdate()) return;
-
-            if (this.currentPage + 1 !== this.totalPages) {
-                if (this.page.page_number % 2 !== 0) {
-                    this.prevPage = this.page
-                } else {
-                    this.prevPage = null
-                }
-
-                this.page = this.pages[++this.currentPage]
+            if (this.currentPage !== this.totalPages - this.offset) {
+                this.currentPage++
             }
         },
 
         previousPage() {
-            if (!this.canUpdate()) return;
-
-            if (this.currentPage + 1 !== 1) {
-                if (this.page.page_number % 2 !== 0) {
-                    this.prevPage = this.pages[this.currentPage - 2]
-                } else {
-                    this.prevPage = null
-                }
-
-                this.page = this.pages[--this.currentPage]
+            if (this.currentPage !== 1) {
+                this.currentPage--
             }
         },
 
@@ -271,33 +199,43 @@ export default {
             }
 
             return true;
+        },
+
+        updateCursorPosition(e) {
+            let target = e.target
+
+            this.cursorPosition = target.selectionStart
         }
     },
 
     watch: {
-        $route(to, from) {
-            this.getChapter()
+        async $route(to, from) {
+            await this.getChapter()
         },
 
-        'page.text'() {
-            if (this.page.text) {
-                this.page.text = this.page.text.slice(0, 500)
-            }
+        'chapter.text'() {
+            this.pages = chapterDivider(this.chapter.text)
         },
 
-        page() {
-            this.pageText = this.page.text
+        pages() {
+            this.pagesFormatted = pageFormatter(this.pages, this.chapter.title, this.offset)
+        },
+
+        image() {
+            console.log(this.image)
         }
     },
 
     async mounted() {
-        await this.getChapter().then(() => {
-            window.onbeforeunload = event =>
-            {
-                if (this.page.text !== this.pageText) {
-                    return confirm("Все несохранённые изменения будут утеряны!");
-                }
-            };
+        await this.getChapter()
+
+        document.addEventListener('keydown', event => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+                // Отменяем стандартное поведение (сохранение страницы)
+                event.preventDefault();
+
+                this.saveChapter()
+            }
         })
     },
 }

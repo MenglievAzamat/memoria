@@ -5,7 +5,6 @@ export const useBookStore = defineStore("book", {
     return {
       book: null,
       chapter: null,
-      page: null,
       chapters: [],
       covers: [],
     }
@@ -17,10 +16,6 @@ export const useBookStore = defineStore("book", {
 
     setChapter(chapter) {
       this.chapter = chapter
-    },
-
-    setPage(page) {
-      this.page = page
     },
 
     setChapters(chapters) {
@@ -85,22 +80,15 @@ export const useBookStore = defineStore("book", {
     },
 
     async getChapter(chapterId) {
-      await this.$axios.get(`/chapter/${chapterId}`).then(response => {
+      return await this.$axios.get(`/chapter/${chapterId}`).then(response => {
         this.setChapter(response.data.chapter)
+        return response.data
       })
     },
 
-    async savePage(pageId, payload) {
-      await this.$axios.post(`/page/${pageId}`, payload).then(async response => {
+    async saveChapter(chapterId, text) {
+      await this.$axios.post(`/chapter/${chapterId}`, { text: text }).then(response => {
         alert(response.data.message)
-        this.setPage(response.data.page)
-      })
-    },
-
-    async addPage(chapterId) {
-      await this.$axios.post(`/chapter/${chapterId}/page`).then(response => {
-        alert(response.data.message)
-        this.setPage(response.data.page)
       })
     },
 

@@ -15,6 +15,7 @@ import Preview from "@/components/Book/Preview.vue";
 import Pagination from "@/components/Pagination.vue";
 import {useBookStore} from "@/stores/book";
 import {useUserStore} from "@/stores/user";
+import {chapterDivider, pageFormatter} from "@/plugins/helpers";
 
 export default {
     name: "ReviewView",
@@ -41,33 +42,14 @@ export default {
             }
 
             for (let chapter of chapters) {
-                chapter.pages[0].title = chapter.title
-                pages.push(...chapter.pages)
+                let chapterPages = chapterDivider(chapter.text)
+
+                pages.push(...pageFormatter(chapterPages, chapter.title, chapter.last_page ?? 0))
             }
 
-            for (let i = 0; i < pages.length; i += 2) {
-                let payload = [
-                    {
-                        text: pages[i].text,
-                        image: pages[i].image,
-                        page: pages[i].page_number,
-                        title: pages[i].title ?? null
-                    }
-                ]
-
-                if (pages[i + 1]) {
-                    payload.push({
-                        text: pages[i + 1].text,
-                        image: pages[i + 1].image,
-                        page: pages[i + 1].page_number,
-                        title: pages[i + 1].title ?? null
-                    })
-                }
-
-                this.pages.push(payload)
+            while (pages.length > 0) {
+                this.pages.push(pages.splice(0, 2))
             }
-
-            console.log(this.pages)
         },
 
         nextPage() {
@@ -94,7 +76,8 @@ export default {
                 })
             }
         }
-    },
+    }
+    ,
 
     mounted() {
         this.bookStore.getChapters(this.bookStore.book.id).then(() => {

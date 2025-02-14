@@ -21,27 +21,23 @@
 
         <div
             class="page w-full p-[64px] flex flex-col"
-            v-for="page in payload.pages"
-            :key="page.id"
+            v-for="(page, index) in payload.pages"
+            :key="index"
         >
             <div class="flex h-[10%]"
-                 :class="{'justify-start text-start' : page.page_number % 2 !== 0, 'justify-end text-end' : page.page_number % 2 === 0 }">
+                 :class="{'justify-start text-start' : page.page % 2 !== 0, 'justify-end text-end' : page.page % 2 === 0 }">
                 <p class="text-black font-['Leotaro'] text-[17pt] text-end leading-none">
-                    {{ page.page_number % 2 !== 0 ? payload.title : payload.subtitle }}</p>
+                    {{ page.page % 2 !== 0 ? payload.title : payload.subtitle }}</p>
             </div>
-            <div class="h-[6%]">
+            <div class="h-[85%] py-2">
                 <p class="text-black font-black font-[Montserrat] text-[20pt] leading-tight text-center mb-4"
                    v-if="page.title">
                     {{ page.title }}</p>
-            </div>
-            <div class="h-[79%] py-2">
                 <p class="text-black font-[Helvetica] text-[17pt] leading-tight text-justify break-words hyphens-auto"
-                   v-html="text(page.text)"
-                   v-if="page.text"></p>
-                <img :src="page.image" alt="" v-else>
+                   v-html="text(page.text)"></p>
             </div>
             <div class="flex justify-center items-center h-[5%]">
-                <p class="text-black font-['Leotaro'] text-[17pt]">{{ page.page_number }}</p>
+                <p class="text-black font-['Leotaro'] text-[17pt]">{{ page.page }}</p>
             </div>
         </div>
     </div>
@@ -52,6 +48,7 @@ import {useBookStore} from "@/stores/book";
 import html2pdf from "html2pdf.js/src";
 import {useUserStore} from "@/stores/user";
 import typo from "ru-typo";
+import {chapterDivider, pageFormatter} from "@/plugins/helpers";
 
 export default {
     name: "PDFGenerateView",
@@ -100,13 +97,11 @@ export default {
             let result = text ?? '';
             result = result.replaceAll('\n', '¡').replaceAll('    ', 'ºººº')
             result = typo(result, {hyphens: true});
-            let t = result
             result = result.split(/\s/).filter(res => res !== '');
 
             let hyphenated = []
             let tmp = ''
 
-            // if (result.length !== 1) {
             for (let word of result) {
                 let shards = word.match(/((?!­).){1,34}/g)
 
@@ -116,8 +111,8 @@ export default {
                             tmp += shard
                             continue
                         }
-
-                        hyphenated.push(tmp += (shard !== shards[0] ? '-' : ''))
+                        console.log(tmp)
+                        hyphenated.push(tmp += ((shard !== shards[0] ? '-' : '').replaceAll('¡', '<br>').replaceAll('ºººº', '&nbsp;&nbsp;&nbsp;&nbsp;')))
                         tmp = shard
                     }
 
@@ -125,15 +120,14 @@ export default {
                 }
             }
 
-            hyphenated.push(tmp)
+            if (tmp.length !== 0) {
+                hyphenated.push(tmp)
+            }
 
             hyphenated = hyphenated.join('')
             hyphenated = hyphenated.replaceAll('¡', '<br>').replaceAll('ºººº', '&nbsp;&nbsp;&nbsp;&nbsp;')
 
             return hyphenated
-
-            // t = t.replaceAll('¡', '<br>').replaceAll('ºººº', '&nbsp;&nbsp;&nbsp;&nbsp;')
-            // return t
         },
 
         async toDataURL(url) {
@@ -148,8 +142,8 @@ export default {
                     }
                     reader.readAsDataURL(xhr.response);
                 };
-                xhr.open('GET', 'http://api.memoriabook.online/public/api/image?filename=' + filename);
-                // xhr.open('GET', 'http://memoria.test/api/image?filename=' + filename);
+                // xhr.open('GET', 'http://api.memoriabook.online/public/api/image?filename=' + filename);
+                xhr.open('GET', 'http://memoria.test/api/image?filename=' + filename);
                 xhr.responseType = 'blob';
                 xhr.send();
             })
@@ -161,21 +155,17 @@ export default {
     },
 
     async mounted() {
-        let pages = this.bookStore.chapters.chapters.reduce(function (acc, curr) {
-            let pages = curr.pages
+        let chapters = this.bookStore.chapters.chapters;
+        let pages = []
 
-            pages[0].title = curr.title
+        for (let index in chapters) {
+            let divided = chapterDivider(chapters[index].text)
+            pages.push(...pageFormatter(divided, chapters[index].title, chapters[index].last_page ?? 0))
 
-            return acc.concat(curr.pages)
-        }, [])
-
-        for (let index in pages) {
-            // pages[index].text = this.text(pages[index].text)
-
-            if (pages[index].title) {
+            if (chapters[index].title) {
                 this.chapters.push({
-                    title: pages[index].title,
-                    page: pages[index].page_number
+                    title: chapters[index].title,
+                    page: (chapters[index].last_page + 1 ?? 1)
                 })
             }
         }
@@ -187,11 +177,13 @@ export default {
             pages: pages
         }
 
-        for (let index in this.payload.pages) {
-            if (this.payload.pages[index].image) {
-                this.getDataUrl(this.payload.pages[index].image, index)
-            }
-        }
+        console.log(this.payload)
+
+        // for (let index in this.payload.pages) {
+        //     if (this.payload.pages[index].image) {
+        //         this.getDataUrl(this.payload.pages[index].image, index)
+        //     }
+        // }
     }
 }
 </script>

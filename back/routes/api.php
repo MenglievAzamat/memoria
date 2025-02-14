@@ -4,7 +4,6 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Book\BookController;
 use App\Http\Controllers\Chapter\ChapterController;
-use App\Http\Controllers\Page\PageController;
 use App\Http\Middleware\AdminRoutes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -51,14 +50,6 @@ Route::prefix('book')
         Route::get('covers', 'getCovers');
     });
 
-Route::prefix('page')
-    ->controller(PageController::class)
-    ->middleware('auth:sanctum')
-    ->group(function () {
-        Route::post('{id}', 'savePage')->whereNumber('id');
-        Route::get('{id}', 'getPage')->whereNumber('id');
-    });
-
 Route::prefix('chapter')
     ->controller(ChapterController::class)
     ->middleware('auth:sanctum')
@@ -67,7 +58,7 @@ Route::prefix('chapter')
             ->whereNumber('id')
             ->group(function () {
                 Route::get('/', 'getChapter');
-                Route::post('/page', 'addPage');
+                Route::post('/', 'saveChapterText');
             });
     });
 

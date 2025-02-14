@@ -13,8 +13,13 @@ return new class extends Migration
     {
         Schema::create('chapters', function (Blueprint $table) {
             $table->id();
+
             $table->unsignedBigInteger('book_id');
             $table->text('title');
+            $table->text('question')->nullable();
+            $table->longText('text')->nullable();
+            $table->integer('last_page')->nullable();
+
             $table->timestamps();
         });
     }

@@ -2,7 +2,6 @@
 
 use App\Models\Book;
 use App\Models\BookStatus;
-use App\Models\Chapter;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -36,12 +35,6 @@ return new class extends Migration
                 ->references('id')
                 ->on('books');
         });
-
-        Schema::table('pages', function (Blueprint $table) {
-            $table->foreign('chapter_id')
-                ->references('id')
-                ->on('chapters');
-        });
     }
 
     /**
@@ -58,12 +51,8 @@ return new class extends Migration
             $table->dropForeignIdFor(Book::class);
         });
 
-        Schema::table('pages', function (Blueprint $table) {
+        Schema::table('chapters', function (Blueprint $table) {
             $table->dropForeignIdFor(Book::class);
-        });
-
-        Schema::table('pages', function (Blueprint $table) {
-            $table->dropForeignIdFor(Chapter::class);
         });
     }
 };
