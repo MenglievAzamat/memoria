@@ -24,8 +24,8 @@
         </div>
 
         <div class="absolute top-0 bottom-0 right-0 left-0 flex justify-center items-center" v-if="popupActive">
-            <div class="background absolute w-full h-full bg-black/80 z-20"></div>
-            <div class="body z-30 rounded min-w-[50rem] p-4">
+            <div class="background absolute w-full h-full bg-black/80 z-20" @click="popupActive = false"></div>
+            <div class="body bg-black/50 z-30 rounded min-w-[50rem] p-8">
                 <textarea v-model="question" placeholder="Вопрос..."/>
                 <textarea v-model="title" placeholder="Оглавление..."/>
                 <div class="flex justify-between">

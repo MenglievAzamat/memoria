@@ -24,7 +24,6 @@
             @click="updateCursorPosition"
             @keyup="updateCursorPosition"
         ></textarea>
-        <p>{{ chapter.text?.length }}</p>
         <div class="flex justify-between mb-8">
             <div class="flex items-start">
                 <button class="mr-2" @click="saveChapter">Сохранить</button>
@@ -56,7 +55,7 @@ import Loading from "@/components/Loading.vue";
 import Pagination from "@/components/Pagination.vue";
 import {useUserStore} from "@/stores/user";
 import {useAdminStore} from "@/stores/admin";
-import { chapterDivider, pageFormatter } from "@/plugins/helpers";
+import {chapterDivider, pageFormatter} from "@/plugins/helpers";
 
 export default {
     name: "ChapterView",
@@ -103,7 +102,7 @@ export default {
                 page: null,
             }
 
-            if (pageNumber % 2 === 0){
+            if (pageNumber % 2 === 0) {
                 if (this.pagesFormatted[this.currentPage - 2]) {
                     leftPage = this.pagesFormatted[this.currentPage - 2]
                 } else {
@@ -147,7 +146,14 @@ export default {
                 this.$emit('input', files[0])
 
                 await this.bookStore.addImage(this.chapter.id, this.image).then(url => {
-                    let tmp = [this.chapter.text.substring(0, this.cursorPosition), this.chapter.text.substring(this.cursorPosition)]
+                    let tmp
+
+                    if (this.cursorPosition !== 0) {
+                        tmp = [this.chapter.text.substring(0, this.cursorPosition), this.chapter.text.substring(this.cursorPosition)]
+                    } else {
+                        tmp = ['', '']
+                    }
+
                     this.chapter.text = tmp[0] + `<img src="${url}" alt="image"/>` + tmp[1]
                 })
             }
@@ -233,6 +239,24 @@ export default {
 
         image() {
             console.log(this.image)
+        },
+
+        cursorPosition() {
+            let pageNumber = 0
+            let totalSymbols = 0
+
+            while (totalSymbols < this.cursorPosition) {
+                if (this.pages[pageNumber]?.length) {
+                    totalSymbols += this.pages[pageNumber]?.length
+                    pageNumber++
+                } else {
+                    break;
+                }
+            }
+
+            if (pageNumber !== this.currentPage) {
+                this.currentPage = pageNumber
+            }
         }
     },
 
@@ -247,11 +271,17 @@ export default {
                 this.saveChapter()
             }
         })
+
+        // window.onbeforeunload = event => {
+        //     return this.canUpdate()
+        // };
     },
 
-    beforeUpdate() {
-        if (!this.canUpdate()) {
-
+    beforeRouteUpdate(to, from, next) {
+        if (this.canUpdate()) {
+            next()
+        } else {
+            next(false)
         }
     }
 }
