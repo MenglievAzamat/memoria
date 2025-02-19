@@ -8,6 +8,7 @@ use App\Models\Chapter;
 use App\Models\Page;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ChapterController extends Controller
 {
@@ -32,6 +33,18 @@ class ChapterController extends Controller
 
         return response()->json([
             'message' => 'Сохранено'
+        ]);
+    }
+
+    public function addImage(Request $request, $chapterId): JsonResponse
+    {
+        $image = $request->file('image');
+
+        $url = Storage::disk('public')->put('chapters', $image);
+        $url = env('APP_URL') . '/storage/' . $url;
+
+        return response()->json([
+            'url' => $url
         ]);
     }
 }

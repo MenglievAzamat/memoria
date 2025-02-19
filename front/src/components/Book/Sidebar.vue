@@ -5,7 +5,7 @@
 
             <Progress :progress="percentage"/>
 
-            <p class="text-[0.875rem] mt-2">{{ `${current_page} из 100 страниц` }}</p>
+            <p class="text-[0.875rem] mt-2">{{ `${current_page} из 100 страниц заполнено` }}</p>
         </div>
         <div class="menu h-[24.75rem] overflow-scroll mb-4">
             <MenuItem text="Обложка" to="/client/book/cover"/>
@@ -100,9 +100,13 @@ export default {
     },
 
     mounted() {
-        this.total_pages = this.store.chapters.total_count
-        this.current_page = this.store.chapters.progress
         this.chapters = this.store.chapters.chapters
+
+        setTimeout(() => {
+            this.store.getTotalPages(this.store.book.id).then(response => {
+                this.current_page = response
+            })
+        }, 1000)
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {

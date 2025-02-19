@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Book;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\BookStatus;
+use App\Models\Chapter;
 use App\Models\CoverType;
 use App\Models\Page;
 use App\Models\Questionnaire;
@@ -119,6 +120,17 @@ class BookController extends Controller
 
         return response()->json([
             'message' => 'Книга ' . ($book->open ? 'открыта' : 'закрыта'),
+        ]);
+    }
+
+    public function getTotalPages($bookId): JsonResponse
+    {
+        $book = Book::query()->findOrFail($bookId);
+
+        $pagesCount = $book->chapters->reduce(fn ($acc, $chapter) => $acc + $chapter->countPages(), 0);
+
+        return response()->json([
+            'total_pages' => $pagesCount
         ]);
     }
 }

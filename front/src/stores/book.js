@@ -87,7 +87,7 @@ export const useBookStore = defineStore("book", {
     },
 
     async saveChapter(chapterId, text) {
-      await this.$axios.post(`/chapter/${chapterId}`, { text: text }).then(response => {
+      await this.$axios.post(`/chapter/${chapterId}`, {text: text}).then(response => {
         alert(response.data.message)
       })
     },
@@ -121,6 +121,25 @@ export const useBookStore = defineStore("book", {
     async toggleBook(bookId) {
       await this.$axios.post(`/book/${bookId}/toggle`).then(response => {
         alert(response.data.message)
+      })
+    },
+
+    async getTotalPages(bookId) {
+      return await this.$axios.get(`/book/${bookId}/total-pages`).then(response => {
+        return response.data.total_pages
+      })
+    },
+
+    async addImage(chapterId, image) {
+      let formData = new FormData()
+      formData.append('image', image)
+
+      return await this.$axios.post(`/chapter/${chapterId}/image`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(response => {
+        return response.data.url
       })
     }
   }

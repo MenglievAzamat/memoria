@@ -94,6 +94,10 @@ export default {
         },
 
         text(text) {
+            if (text.includes('<img')) {
+                return text
+            }
+
             let result = text ?? '';
             result = result.replaceAll('\n', '¡').replaceAll('    ', 'ºººº')
             result = typo(result, {hyphens: true});
@@ -103,15 +107,15 @@ export default {
             let tmp = ''
 
             for (let word of result) {
-                let shards = word.match(/((?!­).){1,34}/g)
+                let shards = word.match(/((?!­).){1,37}/g)
 
                 if (shards) {
                     for (let shard of shards) {
-                        if (tmp.length + shard.length <= 34) {
+                        if (tmp.length + shard.length <= 37) {
                             tmp += shard
                             continue
                         }
-                        console.log(tmp)
+
                         hyphenated.push(tmp += ((shard !== shards[0] ? '-' : '').replaceAll('¡', '<br>').replaceAll('ºººº', '&nbsp;&nbsp;&nbsp;&nbsp;')))
                         tmp = shard
                     }
@@ -130,9 +134,9 @@ export default {
             return hyphenated
         },
 
-        async toDataURL(url) {
+        toDataURL(url) {
             return new Promise((resolve, reject) => {
-                let filename = url.split('/').splice(5).join('/')
+                let filename = url.split('/').splice(4).join('/')
 
                 let xhr = new XMLHttpRequest();
                 xhr.onload = function () {
@@ -162,6 +166,15 @@ export default {
             let divided = chapterDivider(chapters[index].text)
             pages.push(...pageFormatter(divided, chapters[index].title, chapters[index].last_page ?? 0))
 
+            for (let index in pages) {
+                if (pages[index].text?.includes('<img')) {
+                    let match = pages[index].text.match(/http:\/\/.+\.\w+/g)
+                    let newUrl = await this.toDataURL(match[0])
+
+                    pages[index].text = pages[index].text.replace(/http:\/\/.+\.\w+/, newUrl)
+                }
+            }
+
             if (chapters[index].title) {
                 this.chapters.push({
                     title: chapters[index].title,
@@ -176,8 +189,6 @@ export default {
             cover: await this.toDataURL(this.bookStore.book.cover_type.image_link),
             pages: pages
         }
-
-        console.log(this.payload)
 
         // for (let index in this.payload.pages) {
         //     if (this.payload.pages[index].image) {

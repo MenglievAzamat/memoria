@@ -5,10 +5,15 @@ export function chapterDivider(text) {
     let words = text.split(/\s/g)
     let page = ''
 
-    for (let index in words) {
+    for (let index = 0; index < words.length; index++) {
       let length = result.length === 0 ? 500 : 534
 
-      if (page.length + words[index].length <= length) {
+      if (words[index].includes('<img')) {
+        result.push(page.trim())
+        page = ''
+        let imgTag = [words[index], words[++index], words[++index]].join(' ')
+        result.push(imgTag)
+      } else if (page.length + words[index].length <= length) {
         page += words[index] + ' '
       } else {
         result.push(page.trim())

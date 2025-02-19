@@ -44,7 +44,9 @@ class Chapter extends Model
             $page = '';
 
             foreach ($words as $word) {
-                if (mb_strlen($word) + mb_strlen($page) <= 500) {
+                $length = count($result) === 0 ? 500 : 534;
+
+                if (mb_strlen($word) + mb_strlen($page) <= $length) {
                     $page .= $word . ' ';
                 } else {
                     $result[] = trim($page);

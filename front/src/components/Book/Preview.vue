@@ -11,13 +11,13 @@
                     <p class="text-black text-wrap text-[1.66625rem] font-['Leotaro'] text-left">{{ book.title }}</p>
                 </div>
                 <div class="body h-[85%]">
-                    <p v-if="payload[0]?.title" class="font-[Montserrat] text-black text-[1.66625rem] text-center mb-4 font-bold">{{ payload[0]?.title }}</p>
+                    <p v-if="payload[0]?.title" class="font-[Montserrat] text-black text-[1.66625rem] text-center mb-[.4rem] font-bold">{{ payload[0]?.title }}</p>
                     <img v-if="payload[0]?.image" class="w-full h-full" :src="payload[0]?.image" alt="">
                     <p class="break-words hyphens-auto helvetica text-[1.4163125rem] text-black text-justify" v-html="text(payload[0]?.text)"></p>
                 </div>
                 <div class="footer h-[5%]">
                     <p class="helvetica text-[1.4163125rem] text-black">{{ payload[0] ? payload[0].page : ''}}</p>
-                    <p class="helvetica text-[1.4163125rem] text-black">{{ payload[0].text.length}}</p>
+<!--                    <p class="helvetica text-[1.4163125rem] text-black">{{ payload[0]?.text?.length}}</p>-->
                 </div>
             </div>
             <div class="w-1/2 h-full flex flex-col justify-center p-[4rem]">
@@ -25,13 +25,13 @@
                     <p class="text-black text-wrap text-[1.66625rem] font-['Leotaro'] text-right">{{ book.subtitle }}</p>
                 </div>
                 <div class="body h-[85%]">
-                    <p v-if="payload[1]?.title" class="font-[Montserrat] text-black text-[1.66625rem] text-center mb-4 font-bold">{{ payload[1]?.title }}</p>
+                    <p v-if="payload[1]?.title" class="font-[Montserrat] text-black text-[1.66625rem] text-center mb-[.4rem] font-bold">{{ payload[1]?.title }}</p>
                     <img v-if="payload[1]?.image" class="w-full h-full" :src="payload[1]?.image" alt="">
                     <p class="break-words hyphens-auto helvetica text-[1.4163125rem] text-black text-justify" v-html="text(payload[1]?.text)"></p>
                 </div>
                 <div class="footer h-[5%]">
                     <p class="helvetica text-[1.4163125rem]  text-black">{{ payload[1] ? payload[1].page : ''}}</p>
-                    <p class="helvetica text-[1.4163125rem]  text-black">{{ payload[1].text.length}}</p>
+<!--                    <p class="helvetica text-[1.4163125rem]  text-black">{{ payload[1]?.text?.length}}</p>-->
                 </div>
             </div>
         </div>

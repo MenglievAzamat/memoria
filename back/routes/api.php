@@ -44,6 +44,8 @@ Route::prefix('book')
 
                 Route::post('close', 'closeBook');
                 Route::post('toggle', 'toggleBook');
+
+                Route::get('total-pages', 'getTotalPages');
             });
 
         Route::get('user/{id}', 'showByUserId');
@@ -59,6 +61,7 @@ Route::prefix('chapter')
             ->group(function () {
                 Route::get('/', 'getChapter');
                 Route::post('/', 'saveChapterText');
+                Route::post('/image', 'addImage');
             });
     });
 

@@ -24,6 +24,7 @@
             @click="updateCursorPosition"
             @keyup="updateCursorPosition"
         ></textarea>
+        <p>{{ chapter.text?.length }}</p>
         <div class="flex justify-between mb-8">
             <div class="flex items-start">
                 <button class="mr-2" @click="saveChapter">Сохранить</button>
@@ -81,6 +82,7 @@ export default {
         image: null,
 
         loading: false,
+        chapterText: null,
     }),
 
     computed: {
@@ -129,7 +131,7 @@ export default {
             document.querySelector('#fileInput').click()
         },
 
-        makeInput() {
+        async makeInput() {
             const input = document.querySelector('#fileInput')
             const files = input.files
 
@@ -143,6 +145,11 @@ export default {
                 reader.readAsDataURL(files[0])
                 this.image = files[0]
                 this.$emit('input', files[0])
+
+                await this.bookStore.addImage(this.chapter.id, this.image).then(url => {
+                    let tmp = [this.chapter.text.substring(0, this.cursorPosition), this.chapter.text.substring(this.cursorPosition)]
+                    this.chapter.text = tmp[0] + `<img src="${url}" alt="image"/>` + tmp[1]
+                })
             }
         },
 
@@ -154,6 +161,7 @@ export default {
                     this.chapter = response.chapter
                     this.offset = response.pc_last_page ?? 0
                     this.currentPage = 1
+                    this.chapterText = response.chapter.text
                 })
                 .finally(() => {
                     this.loading = false
@@ -177,6 +185,7 @@ export default {
 
             await this.bookStore.saveChapter(this.chapter.id, this.chapter.text)
                 .finally(() => {
+                    location.reload()
                     this.loading = false
                 })
         },
@@ -194,7 +203,7 @@ export default {
         },
 
         canUpdate() {
-            if (this.page.text !== this.pageText) {
+            if (this.chapter.text !== this.chapterText) {
                 return confirm('Вы сохранили страницу? Введённые изменения будут утеряны!')
             }
 
@@ -215,6 +224,7 @@ export default {
 
         'chapter.text'() {
             this.pages = chapterDivider(this.chapter.text)
+            // this.pages = [this.chapter.text]
         },
 
         pages() {
@@ -238,5 +248,11 @@ export default {
             }
         })
     },
+
+    beforeUpdate() {
+        if (!this.canUpdate()) {
+
+        }
+    }
 }
 </script>
