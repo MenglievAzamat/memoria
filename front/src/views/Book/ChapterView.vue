@@ -55,7 +55,7 @@ import Loading from "@/components/Loading.vue";
 import Pagination from "@/components/Pagination.vue";
 import {useUserStore} from "@/stores/user";
 import {useAdminStore} from "@/stores/admin";
-import {chapterDivider, pageFormatter} from "@/plugins/helpers";
+import {chapterDivider, chapterDividerV2, pageFormatter} from "@/plugins/helpers";
 
 export default {
     name: "ChapterView",
@@ -229,8 +229,8 @@ export default {
         },
 
         'chapter.text'() {
-            this.pages = chapterDivider(this.chapter.text)
-            // this.pages = [this.chapter.text]
+            // this.pages = chapterDivider(this.chapter.text)
+            this.pages = chapterDividerV2(this.chapter.text)
         },
 
         pages() {
@@ -278,6 +278,14 @@ export default {
     },
 
     beforeRouteUpdate(to, from, next) {
+        if (this.canUpdate()) {
+            next()
+        } else {
+            next(false)
+        }
+    },
+
+    beforeRouteLeave(to, from, next) {
         if (this.canUpdate()) {
             next()
         } else {

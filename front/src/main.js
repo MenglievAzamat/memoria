@@ -18,8 +18,8 @@ pinia.use(({ store }) => {
 
 app.use(router)
   .use(axios, {
-    // baseUrl: 'http://api.memoriabook.online/public/api/',
-    baseUrl: 'http://memoria.test/api',
+    baseUrl: 'https://api.memoriabook.online/public/api/',
+    // baseUrl: 'http://memoria.test/api',
   })
   .use(pinia)
   .mount('#app')

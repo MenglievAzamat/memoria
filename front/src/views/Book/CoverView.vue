@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p class="text-[1.5rem] mb-[4.6875rem]">Выберите необходимую обложку</p>
+        <p class="text-[1.5rem] mb-[4.6875rem]">Выберите цвет обложки</p>
 
         <div class="flex flex-wrap">
             <div
