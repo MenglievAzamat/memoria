@@ -15,7 +15,7 @@ import Preview from "@/components/Book/Preview.vue";
 import Pagination from "@/components/Pagination.vue";
 import {useBookStore} from "@/stores/book";
 import {useUserStore} from "@/stores/user";
-import {chapterDivider, pageFormatter} from "@/plugins/helpers";
+import {chapterDivider, chapterDividerV2, pageFormatter} from "@/plugins/helpers";
 
 export default {
     name: "ReviewView",
@@ -41,8 +41,13 @@ export default {
                 subtitle: book.subtitle,
             }
 
+            this.pages[1] = {
+                review: true,
+                chapters: chapters
+            }
+
             for (let chapter of chapters) {
-                let chapterPages = chapterDivider(chapter.text)
+                let chapterPages = chapterDividerV2(chapter.text)
 
                 pages.push(...pageFormatter(chapterPages, chapter.title, chapter.last_page ?? 0))
             }

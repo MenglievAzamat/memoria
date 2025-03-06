@@ -35,8 +35,11 @@
                     <p class="text-black font-black font-[Montserrat] text-[20pt] leading-tight text-center mb-4"
                        v-if="page.title">
                         {{ page.title }}</p>
-                    <p class="text-black font-[RobotoMono] text-[17pt] leading-tight text-justify break-words hyphens-auto"
-                       v-html="hyphenate(page.text)"></p>
+                    <div class="flex" :class="{'justify-between': wrapLine(line) > threshold }"
+                         v-for="(line, index) in page.text">
+                        <p :class="{'mr-3' : wrapLine(line) <= threshold}"
+                           class="helvetica text-[17pt] text-black" v-for="word in line" v-html="word"></p>
+                    </div>
                 </div>
                 <div class="flex justify-center items-center h-[5%]">
                     <p class="text-black font-['Leotaro'] text-[17pt]">{{ page.page }}</p>
@@ -50,9 +53,9 @@
 import {useBookStore} from "@/stores/book";
 import html2pdf from "html2pdf.js/src";
 import {useUserStore} from "@/stores/user";
-import {chapterDivider, pageFormatter, hyphenate} from "@/plugins/helpers";
+import {pageFormatter, chapterDividerV2, wrapLine, threshold} from "@/plugins/helpers";
 import Loading from "@/components/Loading.vue";
-import typo from "ru-typo";
+
 
 export default {
     name: "PDFGenerateView",
@@ -71,11 +74,15 @@ export default {
         chapters: [],
 
         loading: false,
+
+        threshold: 25,
     }),
 
     methods: {
-        typo,
-        hyphenate,
+        wrapLine(line) {
+            return line.reduce((acc, curr) => acc + curr.length, 0)
+        },
+
         print() {
             let el = document.getElementById('pdf');
 
@@ -114,8 +121,8 @@ export default {
                     }
                     reader.readAsDataURL(xhr.response);
                 };
-                // xhr.open('GET', 'https://api.memoriabook.online/public/api/image?filename=' + filename);
-                xhr.open('GET', 'http://memoria.test/api/image?filename=' + filename);
+                xhr.open('GET', 'https://api.memoriabook.online/public/api/image?filename=' + filename);
+                // xhr.open('GET', 'http://memoria.test/api/image?filename=' + filename);
                 xhr.responseType = 'blob';
                 xhr.send();
             })
@@ -133,7 +140,8 @@ export default {
         let pages = []
 
         for (let index in chapters) {
-            let divided = chapterDivider(chapters[index].text)
+            // let divided = chapterDivider(chapters[index].text)
+            let divided = chapterDividerV2(chapters[index].text)
 
             pages.push(...pageFormatter(divided, chapters[index].title, chapters[index].last_page ?? 0))
 
@@ -160,7 +168,9 @@ export default {
             cover: await this.toDataURL(this.bookStore.book.cover_type.image_link),
             pages: pages
         }
-
+        console.log(
+            this.payload
+        )
         this.loading = false;
     }
 }

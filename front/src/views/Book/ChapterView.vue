@@ -131,6 +131,10 @@ export default {
         },
 
         async makeInput() {
+            alert('Каждая добавленная фотография займет целую страницу. ' +
+                'В текстовой строке появится "ссылка" на фото — она должна находиться в новой строке. ' +
+                'Чтобы удалить фотографию, просто удалите текст "ссылки".')
+
             const input = document.querySelector('#fileInput')
             const files = input.files
 
@@ -242,21 +246,31 @@ export default {
         },
 
         cursorPosition() {
-            let pageNumber = 0
-            let totalSymbols = 0
+            let symbols = 0
+            let page = null;
 
-            while (totalSymbols < this.cursorPosition) {
-                if (this.pages[pageNumber]?.length) {
-                    totalSymbols += this.pages[pageNumber]?.length
-                    pageNumber++
-                } else {
-                    break;
+            for (let i in this.pages) {
+                for (let j in this.pages[i]) {
+                    for (let k in this.pages[i][j]) {
+                        if (symbols > this.cursorPosition) {
+                            page = i
+                            break
+                        }
+
+                        symbols += this.pages[i][j][k].length + 1
+                    }
+
+                    if (page !== null) {
+                        break
+                    }
+                }
+
+                if (page !== null) {
+                    break
                 }
             }
 
-            if (pageNumber !== this.currentPage) {
-                this.currentPage = pageNumber
-            }
+            this.currentPage = +page + 1
         }
     },
 

@@ -45,6 +45,8 @@
         <path d="M20.5 9.90193C22.5 11.0566 22.5 13.9434 20.5 15.0981L4.74999 24.1913C2.74999 25.346 0.249999 23.9027 0.249999 21.5933L0.25 3.40673C0.25 1.09733 2.75 -0.346044 4.75 0.808656L20.5 9.90193Z" fill="#E3B661"/>
     </svg>
 
+    <svg v-else-if="type === 'play'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80L0 432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg>
+
 </template>
 
 <script>

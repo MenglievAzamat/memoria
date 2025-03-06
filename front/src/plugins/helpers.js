@@ -1,9 +1,9 @@
 import typo from "ru-typo";
-import {createLogger} from "vuex";
 
 export function chapterDividerV2(text) {
-  let lineLength = 30
+  let lineLength = 35
   let pageLines = 18
+  text = '    ' + text
 
   let nlSplit = text.split('\n')
 
@@ -65,6 +65,10 @@ export function chapterDividerV2(text) {
         page.push(lines.shift())
         count++
       } else {
+        if (result.length === 0) {
+            pageLines = pageLines + 1
+        }
+
         result.push(page)
         page = []
         count = 1
@@ -74,6 +78,7 @@ export function chapterDividerV2(text) {
     result.push(page)
   }
 
+  result = result.map(r => r.map(rr => rr.replaceAll('¡¡¡¡', '&nbsp;&nbsp;&nbsp;&nbsp;')))
   result = result.map(r => r.map(rr => rr.includes('<img') ? [rr] : rr.split(' ')))
 
   return result
