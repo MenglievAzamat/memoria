@@ -3,6 +3,7 @@
     <div v-else>
         <p v-if="user.type !== 'admin'" class="leading-none text-[1.5rem] mb-10">{{ chapter?.question }}</p>
         <div v-else>
+            <button class="mb-4" :disabled="canDelete" @click="deleteChapter">Удалить главу</button>
             <div class="flex">
                 <input class="text-[1.5rem] mb-4 h-[2.9375rem] !rounded-r-none" type="text" v-model="chapter.title"
                        placeholder="Заголовок...">
@@ -85,6 +86,14 @@ export default {
     }),
 
     computed: {
+        canDelete() {
+            if (this.chapter.text) {
+                return this.chapter.text.length
+            }
+
+            return false
+        },
+
         totalPages() {
             return (this.pages.length > 0 ? this.pages.length : 1) + this.offset
         },
@@ -158,7 +167,7 @@ export default {
                         tmp = ['', '']
                     }
 
-                    this.chapter.text = tmp[0] + `<img src="${url}" alt="image"/>` + tmp[1]
+                    this.chapter.text = tmp[0] + `\n<img src="${url}" alt="image"/>\n` + tmp[1]
                 })
             }
         },
@@ -199,6 +208,17 @@ export default {
                     this.loading = false
                 })
         },
+
+        async deleteChapter() {
+            this.loading = true
+
+            await this.bookStore.deleteChapter(this.chapter.id)
+                .finally(() => {
+                    location.href = '/client/book/cover'
+                    this.loading = false
+                })
+        },
+
 
         nextPage() {
             if (this.currentPage !== this.totalPages - this.offset) {

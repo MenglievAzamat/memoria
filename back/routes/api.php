@@ -61,6 +61,7 @@ Route::prefix('chapter')
             ->group(function () {
                 Route::get('/', 'getChapter');
                 Route::post('/', 'saveChapterText');
+                Route::delete('/', 'deleteChapter');
                 Route::post('/image', 'addImage');
             });
     });

@@ -7,15 +7,15 @@
                 <img class="w-full" :src="payload.cover" alt="">
             </div>
 
-            <div class="page w-full flex flex-col justify-center items-center">
-                <h1 class="text-[20pt] text-black font-['Leotaro']">{{ payload.title }}</h1>
-                <h2 class="text-[12pt] text-black font-['Leotaro']">{{ payload.subtitle }}</h2>
+            <div class="page w-full flex flex-col justify-center items-center p-[62px]">
+                <h1 class="text-[20pt] text-black font-['Leotaro'] text-center">{{ payload.title }}</h1>
+                <h2 class="text-[12pt] text-black font-['Leotaro'] text-center">{{ payload.subtitle }}</h2>
             </div>
 
             <div class="page w-full flex flex-col items-center justify-center p-[62px]">
-                <h1 class="text-[20pt] text-black font-['Leotaro'] text-center w-full">СОДЕРЖАНИЕ</h1>
-                <div v-for="chapter in chapters" :key="chapter.title" class="flex justify-between items-end w-full my-2">
-                    <p class="font-bold text-[12pt] text-black font-[Montserrat] leading-none">{{ chapter.title }}</p>
+                <h1 class="text-[20pt] text-black font-['Leotaro'] text-center w-full mb-[16px]">СОДЕРЖАНИЕ</h1>
+                <div v-for="chapter in chapters" :key="chapter.title" class="flex justify-between items-center w-full my-2">
+                    <p class="font-bold text-[12pt] text-black font-[Montserrat] leading-none text-start">{{ chapter.title }}</p>
                     <span class="dotted"></span>
                     <p class="font-bold text-[12pt] text-black font-[Montserrat] leading-none">{{ chapter.page }}</p>
                 </div>
@@ -38,7 +38,7 @@
                     <div class="flex" :class="{'justify-between': wrapLine(line) > threshold }"
                          v-for="(line, index) in page.text">
                         <p :class="{'mr-3' : wrapLine(line) <= threshold}"
-                           class="helvetica text-[17pt] text-black" v-for="word in line" v-html="word"></p>
+                           class="helvetica leading-[125%] text-[17pt] text-black" v-for="word in line" v-html="word"></p>
                     </div>
                 </div>
                 <div class="flex justify-center items-center h-[5%]">
@@ -88,7 +88,7 @@ export default {
 
             html2pdf()
                 .set({
-                    filename: this.userStore.user.name + '.pdf',
+                    filename: this.bookStore.book.user.name + '.pdf',
 
                     image: {
                         type: "jpeg",
@@ -154,11 +154,11 @@ export default {
         }
 
         for (let index in pages) {
-            if (pages[index].text?.includes('<img')) {
-                let match = pages[index].text.match(/(http|https):\/\/.+\.\w+/g)
+            if (typeof pages[index].text[0] != 'undefined' && pages[index].text[0][0]?.includes('<img')) {
+                let match = pages[index].text[0][0].match(/(http|https):\/\/.+\.\w+/g)
                 let newUrl = await this.toDataURL(match[0])
 
-                pages[index].text = pages[index].text.replace(/(http|https):\/\/.+\.\w+/, newUrl)
+                pages[index].text[0][0] = pages[index].text[0][0].replace(/(http|https):\/\/.+\.\w+/, newUrl)
             }
         }
 
@@ -168,9 +168,7 @@ export default {
             cover: await this.toDataURL(this.bookStore.book.cover_type.image_link),
             pages: pages
         }
-        console.log(
-            this.payload
-        )
+
         this.loading = false;
     }
 }

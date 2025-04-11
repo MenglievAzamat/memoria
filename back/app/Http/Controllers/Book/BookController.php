@@ -5,13 +5,11 @@ namespace App\Http\Controllers\Book;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\BookStatus;
-use App\Models\Chapter;
 use App\Models\CoverType;
-use App\Models\Page;
 use App\Models\Questionnaire;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -19,7 +17,7 @@ class BookController extends Controller
     {
         return response()->json([
             'book' => Book::query()
-                ->with(['questionnaire', 'coverType'])
+                ->with(['questionnaire', 'coverType', 'user'])
                 ->findOrFail($id)
         ]);
     }
@@ -130,7 +128,8 @@ class BookController extends Controller
         $pagesCount = $book->chapters->reduce(fn ($acc, $chapter) => $acc + $chapter->countPages(), 0);
 
         return response()->json([
-            'total_pages' => $pagesCount
+            'total_pages' => $pagesCount,
+            'due' => $book->created_at->addYear()->locale('ru')->translatedFormat('j F Y')
         ]);
     }
 }

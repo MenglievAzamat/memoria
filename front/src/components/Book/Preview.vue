@@ -8,12 +8,12 @@
         <div v-else-if="payload.review" class="w-full h-full px-[1.5rem] z-10 flex">
             <div class="w-1/2 h-full flex flex-col justify-center p-[3.8rem]">
             </div>
-            <div class="w-1/2 h-full flex flex-col justify-start p-[3.8rem]">
-                <h1 class="text-black text-wrap text-[1.66625rem] font-['Leotaro']">Содержание</h1>
-                <div class="flex justify-between items-end" v-for="item in payload.chapters">
-                    <h2 class="text-[0.99975rem] helvetica text-black">{{ item.title }}</h2>
+            <div class="w-1/2 h-full flex flex-col justify-center p-[3.8rem]">
+                <h1 class="text-black text-wrap text-[1.66625rem] font-['Leotaro'] mb-4">Содержание</h1>
+                <div class="flex justify-between items-center" v-for="item in payload.chapters">
+                    <h2 class="text-[1.125rem] font-[Montserrat] font-bold text-black text-start">{{ item.title }}</h2>
                     <span class="bb"></span>
-                    <h2 class="text-[0.99975rem] helvetica">{{ (item.last_page ?? 0) + 1 }}</h2>
+                    <h2 class="text-[1.125rem] helvetica">{{ (item.last_page ?? 0) + 1 }}</h2>
                 </div>
             </div>
         </div>
@@ -119,4 +119,5 @@ export default {
     border-bottom: 1px dotted black;
     flex-grow: 1;
 }
+
 </style>

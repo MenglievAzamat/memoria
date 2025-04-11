@@ -36,6 +36,15 @@ class ChapterController extends Controller
         ]);
     }
 
+    public function deleteChapter(Request $request, int $chapterId): JsonResponse
+    {
+        Chapter::query()->whereId($chapterId)->delete();
+
+        return response()->json([
+            'message' => 'Глава успешно удалена!'
+        ]);
+    }
+
     public function addImage(Request $request, $chapterId): JsonResponse
     {
         $image = $request->file('image');

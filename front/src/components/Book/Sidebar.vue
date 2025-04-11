@@ -1,11 +1,13 @@
 <template>
     <div class="overflow-scroll w-full h-full bg-[#131313]">
-        <div class="logo flex flex-col justify-center items-center px-[2.25rem] py-[4.6875rem]">
+        <div class="logo flex flex-col justify-center items-center px-[2.25rem] pt-[4.6875rem] pb-[2.6875rem]">
             <img class="w-[15.5rem] h-[3.875rem] mb-[1.875rem]" src="@/assets/img/logo.png" alt="logo.png">
 
             <Progress :progress="percentage"/>
 
             <p class="text-[0.875rem] mt-2">{{ `${current_page} из 100 страниц заполнено` }}</p>
+
+            <p class="text-[0.875rem] mt-8">{{ `Книга доступна до ` }} <span class="text-[#FDD892]">{{ due }}</span></p>
         </div>
         <div class="menu h-[24.75rem] overflow-scroll mb-4">
             <MenuItem text="Обложка" to="/client/book/cover"/>
@@ -58,6 +60,7 @@ export default {
 
         current_page: 1,
         total_pages: 100,
+        due: '-',
         chapters: [],
 
         popupActive: false,
@@ -104,7 +107,9 @@ export default {
 
         setTimeout(() => {
             this.store.getTotalPages(this.store.book.id).then(response => {
-                this.current_page = response
+                console.log(response)
+                this.current_page = response.total_pages
+                this.due = response.due
             })
         }, 1000)
 

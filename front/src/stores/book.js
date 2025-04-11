@@ -92,6 +92,12 @@ export const useBookStore = defineStore("book", {
       })
     },
 
+    async deleteChapter(chapterId) {
+      await this.$axios.delete(`/chapter/${chapterId}`).then(response => {
+        alert(response.data.message)
+      })
+    },
+
     async generatePDF(bookId) {
       await this.$axios.get(`/book/${bookId}/pdf`, {
         responseType: 'blob'
@@ -126,7 +132,7 @@ export const useBookStore = defineStore("book", {
 
     async getTotalPages(bookId) {
       return await this.$axios.get(`/book/${bookId}/total-pages`).then(response => {
-        return response.data.total_pages
+        return response.data
       })
     },
 
