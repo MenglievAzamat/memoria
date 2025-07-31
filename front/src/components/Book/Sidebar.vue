@@ -107,7 +107,6 @@ export default {
 
         setTimeout(() => {
             this.store.getTotalPages(this.store.book.id).then(response => {
-                console.log(response)
                 this.current_page = response.total_pages
                 this.due = response.due
             })

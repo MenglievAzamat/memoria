@@ -2,7 +2,7 @@
     <Loading v-if="loading" text="Генерируется PDF файл, ожидайте..."/>
     <div v-else>
         <button @click="print">Print</button>
-        <div id="pdf" class="w-full p-0 m-0 bg-white">
+        <div id="pdf-0" class="pdf w-full p-0 m-0 bg-white">
             <div class="page w-full flex flex-col justify-center items-center">
                 <img class="w-full" :src="payload.cover" alt="">
             </div>
@@ -20,10 +20,11 @@
                     <p class="font-bold text-[12pt] text-black font-[Montserrat] leading-none">{{ chapter.page }}</p>
                 </div>
             </div>
-
+        </div>
+        <div v-for="(pages, index) in payload.pages" :id="`pdf-${index+1}`" class="pdf w-full p-0 m-0 bg-white">
             <div
                 class="page w-full p-[62px] flex flex-col"
-                v-for="(page, index) in payload.pages"
+                v-for="(page, index) in pages"
                 :key="index"
             >
                 <div class="flex h-[10%]"
@@ -84,29 +85,41 @@ export default {
         },
 
         print() {
-            let el = document.getElementById('pdf');
+            this.loading = true
 
-            html2pdf()
-                .set({
-                    filename: this.bookStore.book.user.name + '.pdf',
+            let els = [
+                document.getElementById('pdf-0')
+            ];
 
-                    image: {
-                        type: "jpeg",
-                        quality: 0.98
-                    },
+            for (let index in this.payload.pages) {
+                els.push(document.getElementById(`pdf-${+index+1}`))
+            }
 
-                    html2canvas: {
-                        dpi: 192,
-                        letterRendering: true,
-                        allowTaint: true,
-                    },
+            for (let i in els) {
+                html2pdf()
+                    .set({
+                        filename: this.bookStore.book.user.name + `${i}.pdf`,
 
-                    jsPDF: {
-                        format: 'a5'
-                    },
-                })
-                .from(el)
-                .save()
+                        image: {
+                            type: "jpeg",
+                            quality: 0.98
+                        },
+
+                        html2canvas: {
+                            dpi: 192,
+                            letterRendering: true,
+                            allowTaint: true,
+                        },
+
+                        jsPDF: {
+                            format: 'a5'
+                        },
+                    })
+                    .from(els[i])
+                    .save()
+            }
+
+            this.loading = false
         },
 
         toDataURL(url) {
@@ -162,11 +175,17 @@ export default {
             }
         }
 
+        let chunkedPages = []
+
+        while (pages.length > 0) {
+            chunkedPages.push(pages.splice(0, 30))
+        }
+
         this.payload = {
             title: this.bookStore.book.title,
             subtitle: this.bookStore.book.subtitle,
             cover: await this.toDataURL(this.bookStore.book.cover_type.image_link),
-            pages: pages
+            pages: chunkedPages
         }
 
         this.loading = false;
@@ -175,7 +194,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-#pdf {
+.pdf {
     width: 5.83in;
 }
 
